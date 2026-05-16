@@ -1,0 +1,16 @@
+{
+  "id": "corporate",
+  "name": "Corporate Management System",
+  "version": "1.0.0",
+  "description": "Complete corporate management solution for companies and organizations",
+  "icon": "fa-building",
+  "features": [
+    "Employee Management (Add, Update, Delete)",
+    "Department Management",
+    "Manager & Supervisor Hierarchy",
+    "Employee Directory",
+    "Basic HR Functions"
+  ],
+  "default_plugins": [],
+  "user_roles": ["admin", "manager", "supervisor", "employee"]
+}

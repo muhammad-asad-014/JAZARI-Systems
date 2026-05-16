@@ -1,0 +1,16 @@
+{
+  "id": "education",
+  "name": "Educational Institution Management",
+  "version": "1.0.0",
+  "description": "Complete school, college and university management solution",
+  "icon": "fa-graduation-cap",
+  "features": [
+    "Student Management (Add, Update, Delete)",
+    "Teacher Management",
+    "Class & Section Management",
+    "Subject Management",
+    "Timetable Management"
+  ],
+  "default_plugins": [],
+  "user_roles": ["admin", "teacher", "student"]
+}
