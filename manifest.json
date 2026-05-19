@@ -1,0 +1,18 @@
+{
+  "systems": [
+    {
+      "id": "classroom",
+      "name": "Jazari Classroom",
+      "description": "An all-in-one environment for automated classrooms.",
+      "folder_name": "classroom-system",
+      "version": "1.0.0"
+    },
+    {
+      "id": "corporate",
+      "name": "Jazari Corporate",
+      "description": "Enterprise-grade suite for better management.",
+      "folder_name": "corporate-system",
+      "version": "1.1.0"
+    }
+  ]
+}

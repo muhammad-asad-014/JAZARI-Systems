@@ -1,0 +1,390 @@
+
+@import url('theme.css');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased; /* Makes font look sharper */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Updated Brand Logo - more elegant */
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.brand-logo {
+    max-width: 100%; /* Ensures it doesn't overflow the sidebar */
+    height: auto;    /* Maintains aspect ratio */
+    max-height: 50px; /* Adjust this value based on your sidebar height */
+    object-fit: contain;
+}
+
+/* Sidebar Links - refined weights */
+.nav-links li a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+.nav-links li.active a {
+    color: white;
+}
+
+/* Headings - Simplistic elegance */
+h1, h2, h3 {
+    letter-spacing: -0.03em;
+    font-weight: 700;
+}
+
+.top-bar h1 {
+    font-size: 1.75rem;
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.04em; /* Very tight for numbers looks modern */
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em; /* Wide spacing for small labels */
+    color: var(--text-muted);
+}
+
+/* Table Text Refinement */
+.data-table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.data-table td {
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+
+.copyright {
+    position: relative;
+    bottom: 24px;
+    margin-top: auto;
+    padding: 40px 0 24px 0;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.7;
+    pointer-events: none; /* Ensures it doesn't interfere with background animations */
+    user-select: none;    /* Prevents accidental highlighting */
+}
+
+
+
+
+/* Background Blobs */
+.blob-container { position: fixed; inset: 0; z-index: -1; filter: blur(70px); }
+.blob { position: absolute; border-radius: 50%; opacity: 0.6; }
+
+/* Reusable Glass */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-strength));
+    -webkit-backdrop-filter: blur(var(--blur-strength));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px var(--glass-shadow);
+}
+
+/* Layout */
+.dashboard-container {
+    display: flex;
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px 0;
+    gap: 20px;
+    flex: 1;
+}
+
+/* Sidebar Desktop */
+.sidebar {
+    width: 260px;
+    padding: 30px 20px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.hamburger { display: none; }
+
+.nav-links { list-style: none; margin-top: 30px; }
+.nav-links li { padding: 12px 15px; margin-bottom: 8px; border-radius: var(--radius-md); transition: 0.3s; }
+.nav-links li.active, .nav-links li:hover { background: var(--accent-color); }
+.nav-links li.active a, .nav-links li:hover a { color: white; }
+.nav-links li.active a, .nav-links li:hover img { filter: brightness(0) invert(1);}
+
+.user-profile {
+    display: flex; align-items: center; gap: 10px; margin-top: 30px; 
+    padding-top: 20px; border-top: 1px solid var(--glass-border);
+}
+
+.avatar {
+    width: 35px; height: 35px; background: var(--accent-color); color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+}
+
+/* Main Content */
+.main-content { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.top-bar { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; }
+.stats-grid {
+    animation: slideUpFade 0.5s ease-out;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.stat-card { padding: 30px; }
+.stat-value { font-size: 2rem; font-weight: 700; margin-top: 10px; }
+
+/* Table */
+.data-table-container { 
+    animation: slideUpFade 0.5s ease-out;
+    padding: 30px; }
+.table-scroll { overflow-x: auto; margin-top: 15px; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 450px; }
+.data-table th { text-align: left; padding: 12px; color: var(--text-muted); border-bottom: 1px solid var(--glass-border); }
+.data-table td { padding: 12px; border-bottom: 1px solid rgba(0, 0, 0, 0.03); }
+
+/* --- Responsive & Smooth Hamburger Logic --- */
+@media (max-width: 900px) {
+    .dashboard-container { flex-direction: column; }
+
+    .sidebar { width: 100%; position: relative; top: 0; padding: 20px; }
+
+    .sidebar-header {
+        flex-direction: row; /* Brand and Hamburger side-by-side */
+        flex-wrap: wrap; 
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger .bar { width: 25px; height: 3px; background: var(--text-main); border-radius: 5px; transition: 0.3s; }
+
+    /* Animated X */
+    #menu-toggle:checked + .hamburger .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    #menu-toggle:checked + .hamburger .bar:nth-child(2) { opacity: 0; }
+    #menu-toggle:checked + .hamburger .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* The Fix for Expansion */
+    .nav-container {
+        display: grid;
+        grid-template-rows: 0fr; /* Collapsed */
+        transition: grid-template-rows 0.4s ease-out;
+        width: 100%;
+    }
+
+    /* Content must have min-height 0 for grid-row 0fr to work */
+    .nav-content {
+        min-height: 0;
+        overflow: hidden; 
+    }
+
+    #menu-toggle:checked ~ .nav-container {
+        grid-template-rows: 1fr; /* Expanded */
+        margin-top: 20px;
+    }
+}
+
+/* --- User Profile Dropdown --- */
+.user-profile-container {
+    position: relative;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.user-profile-trigger {
+    width: 100%;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    transition: background 0.3s ease;
+}
+
+.user-profile-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.user-profile-trigger .user-name {
+    font-family: var(--font-main);
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Chevron arrow */
+.chevron {
+    margin-left: auto;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+}
+
+.user-profile-trigger.active .chevron {
+    transform: rotate(-135deg) translateY(-2px);
+}
+
+/* The Dropdown Menu */
+.profile-dropdown {
+    position: absolute;
+    bottom: calc(100% + 10px); /* Pops UP above the profile in sidebar */
+    left: 0;
+    width: 100%;
+    min-width: 220px;
+    display: none; /* Controlled by JS */
+    flex-direction: column;
+    padding: 8px;
+    z-index: 100;
+    animation: slideUp 0.3s ease-out;
+}
+
+.profile-dropdown.show {
+    display: flex;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-item {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 12px 15px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.dropdown-item:hover {
+    background: var(--accent-color);
+    color: white !important;
+}
+
+.dropdown-item.logout {
+    color: #f43f5e; /* Elegant red for logout */
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 4px 8px;
+}
+
+/* Responsive Tweak for Mobile */
+@media (max-width: 900px) {
+    .profile-dropdown {
+        position: static; /* Flows within the menu on mobile */
+        width: 100%;
+        margin-top: 10px;
+        box-shadow: none;
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Notification Container --- */
+.notification-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none; /* Allows clicking through the container area */
+}
+
+.toast {
+    pointer-events: auto; /* Re-enable clicking for the actual toast if needed */
+    min-width: 280px;
+    max-width: 400px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.4s ease;
+}
+
+/* Success Category */
+.toast.success {
+    border-left: 4px solid #10b981;
+    background: rgba(16, 185, 129, 0.15); /* Soft green tint */
+}
+
+.toast.success .toast-icon { color: #10b981; }
+
+/* Error Category */
+.toast.error {
+    border-left: 4px solid #f43f5e;
+    background: rgba(244, 63, 94, 0.15); /* Soft red tint */
+}
+
+.toast.error .toast-icon { color: #f43f5e; }
+
+.toast-icon {
+    font-weight: 900;
+    font-size: 1.1rem;
+}
+
+.toast-content {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* Disappearing Animation */
+.toast.fade-out {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}

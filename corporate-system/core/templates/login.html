@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - JAZARI</title>
+    <!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> -->
+         <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+    <link rel="stylesheet" href="../static/css/login.css">
+</head>
+<body>
+
+    <div class="blob-container" id="blob-container"></div>
+
+    <div class="login-card">
+        <h2>Welcome Back</h2>
+        <p>Enter your credentials to continue</p>
+        <form action="{{url_for('auth.login')}}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="input-group">
+            <input type="text" placeholder="Username" spellcheck="false" name="uname">
+        </div>
+        <div class="input-group">
+            <input type="password" placeholder="Password" name="psw">
+        </div>
+        
+        <button class="login-btn" type="submit">Continue</button>
+        </form>
+    </div>
+
+    <footer class="copyright">
+    &copy; 2026 JAZARI. ALL RIGHTS RESERVED.
+</footer>
+
+    <script src="../static/js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}Plugin Store{% endblock %}
+
+{% block addCSS %}
+<style>
+    .plugin-marketplace {
+        padding: 30px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+
+    .search-container {
+        width: 380px;
+    }
+
+    .search-container input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        background: rgba(255,255,255,0.06);
+        font-size: 1rem;
+    }
+
+    .search-container input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+
+    .plugins-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+    }
+
+    .plugin-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .plugin-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--accent-color);
+    }
+
+    .plugin-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(99, 102, 241, 0.15);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 16px;
+    }
+
+    .plugin-card h3 {
+        margin: 0 0 4px 0;
+        font-size: 1.25rem;
+    }
+
+    .version {
+        color: var(--accent-color);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .author {
+        color: #888;
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+    }
+
+    .summary {
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    /* ---------- BUTTON STYLES ---------- */
+    .install-btn {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--accent-color);
+        border: 2px solid var(--accent-color);
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .install-btn:hover:not(:disabled) {
+        background: var(--accent-color);
+        color: white;
+    }
+
+    .install-btn.installed {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
+    .install-btn.installed:hover:not(:disabled) {
+        background: #dc2626;
+    }
+
+    /* Loading state */
+    .install-btn.installing {
+        background: #f59e0b;
+        color: #1e293b;
+        border-color: #f59e0b;
+        cursor: wait;
+        padding-right: 12px;
+        position: absolute;
+    }
+
+    /* Spinner */
+    .spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    .install-btn.installing .spinner {
+        display: inline-block;
+    }
+
+    /* Animated progress bar (indeterminate) */
+    .install-btn.installing::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 30%;
+        background: rgba(255,255,255,0.7);
+        animation: loading-bar 1.5s ease-in-out infinite;
+        border-radius: 2px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes loading-bar {
+        0%   { left: -30%; }
+        100% { left: 100%; }
+    }
+
+    /* Uninstalling state (same as installing but with red tint) */
+    .install-btn.uninstalling {
+        background: #f87171;
+        color: white;
+        border-color: #f87171;
+        cursor: wait;
+    }
+    .install-btn.uninstalling .spinner {
+        display: inline-block;
+    }
+    .install-btn.uninstalling::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 30%;
+        background: rgba(255,255,255,0.8);
+        animation: loading-bar 1.5s ease-in-out infinite;
+        border-radius: 2px;
+    }
+</style>
+{% endblock %}
+
+{% block sectionTitle %}Plugin Store{% endblock %}
+
+{% block section %}
+<div class="plugin-marketplace">
+
+    <div class="header">
+        <h1>Plugin Marketplace</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search plugins...">
+        </div>
+    </div>
+
+    <div class="plugins-grid" id="pluginsGrid">
+        {% for plugin in plugins %}
+        <div class="plugin-card" data-id="{{ plugin.id }}" data-search="{{ plugin.name|lower }} {{ plugin.summary|lower }}">
+            <h3>{{ plugin.name }} <span class="version">v{{ plugin.version }}</span></h3>
+            <p class="author">{{ plugin.author }}</p>
+            <p class="summary">{{ plugin.summary }}</p>
+
+            {% if plugin.id in installed_ids or plugin.folder_name in installed_ids %}
+                <button onclick="handlePluginAction(this, '{{ plugin.id }}', '{{ plugin.folder_name }}')"
+                        class="install-btn installed"
+                        id="btn-{{ plugin.id }}">
+                    UNINSTALL
+                </button>
+            {% else %}
+                <button onclick="handlePluginAction(this, '{{ plugin.id }}', '{{ plugin.folder_name }}')"
+                        class="install-btn"
+                        id="btn-{{ plugin.id }}">
+                    INSTALL
+                </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <h2>No plugins found</h2>
+        <p>Try adjusting your search terms.</p>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block addJS %}
+<script>
+// Prevent leaving while installations are active
+let activeInstallationsCount = 0;
+window.addEventListener('beforeunload', (e) => {
+    if (activeInstallationsCount > 0) {
+        e.preventDefault();
+        e.returnValue = 'A plugin installation is currently in progress. Leaving now may corrupt the installation.';
+        return e.returnValue;
+    }
+});
+
+// Helper: create spinner element
+function createSpinner() {
+    const spinner = document.createElement('span');
+    spinner.className = 'spinner';
+    return spinner;
+}
+
+// Unified handler for both Install and Uninstall
+function handlePluginAction(btn, pluginId, folderName) {
+    // --- UNINSTALL ---
+    if (btn.classList.contains('installed')) {
+        if (!confirm(`Are you sure you want to uninstall this plugin?`)) return;
+
+        // Disable button and switch to loading state
+        activeInstallationsCount++;
+        btn.classList.add('uninstalling');
+        btn.disabled = true;
+        // Insert spinner + text
+        btn.innerHTML = '';
+        btn.appendChild(createSpinner());
+        btn.appendChild(document.createTextNode(' Uninstalling...'));
+
+        fetch(`/admin/delete-plugin/${folderName}`, {
+            method: 'DELETE',
+            headers: {
+        'X-CSRFToken': '{{ csrf_token() }}' 
+    }
+        })
+        .then(response => response.json())
+        .then(data => {
+            activeInstallationsCount--;
+            btn.classList.remove('uninstalling');
+            if (data.success) {
+                // Transform to Install button
+                btn.textContent = 'INSTALL';
+                btn.classList.remove('installed');
+                btn.disabled = false;
+            } else {
+                alert(data.message || "Uninstallation failed");
+                // Revert to Uninstall
+                btn.textContent = 'UNINSTALL';
+                btn.classList.add('installed');
+                btn.disabled = false;
+            }
+        })
+        .catch(() => {
+            activeInstallationsCount--;
+            alert("Network error during uninstallation");
+            btn.textContent = 'UNINSTALL';
+            btn.classList.add('installed');
+            btn.classList.remove('uninstalling');
+            btn.disabled = false;
+        });
+
+    // --- INSTALL ---
+    } else {
+        activeInstallationsCount++;
+        btn.classList.add('installing');
+        btn.disabled = true;
+        // Add spinner + animated text
+        btn.innerHTML = '';
+        btn.appendChild(createSpinner());
+        btn.appendChild(document.createTextNode(' Installing...'));
+
+        const formData = new FormData();
+        formData.append('plugin_id', pluginId);
+        formData.append('csrf_token', '{{ csrf_token() }}');
+
+        fetch("{{ url_for('adminViews.install_plugin') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            activeInstallationsCount--;
+            btn.classList.remove('installing');
+            if (data.success) {
+                btn.textContent = 'UNINSTALL';
+                btn.classList.add('installed');
+                btn.disabled = false;
+            } else {
+                alert(data.message || "Installation failed");
+                btn.textContent = 'INSTALL';
+                btn.disabled = false;
+            }
+        })
+        .catch(() => {
+            activeInstallationsCount--;
+            alert("Network error during installation");
+            btn.textContent = 'INSTALL';
+            btn.classList.remove('installing');
+            btn.disabled = false;
+        });
+    }
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', () => {
+    const term = document.getElementById('searchInput').value.toLowerCase().trim();
+    let count = 0;
+
+    document.querySelectorAll('.plugin-card').forEach(card => {
+        if (card.dataset.search.includes(term)) {
+            card.style.display = 'block';
+            count++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    document.getElementById('emptyState').style.display = (count === 0) ? 'block' : 'none';
+});
+</script>
+{% endblock %}

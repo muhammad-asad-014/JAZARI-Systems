@@ -1,0 +1,323 @@
+{% extends 'teacher/teacher-base.html' %}
+{% block title %}Update Profile{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+    /* --- Layout Container --- */
+.profile-form-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 25px;
+    align-items: start;
+    animation: slideUpFade 0.5s ease-out;
+}
+
+/* --- Sidebar Styling --- */
+.profile-sidebar {
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatar-preview {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid var(--glass-border);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.avatar-preview.styled-placeholder {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+.avatar-text {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.admin-meta h3 { font-size: 1.1rem; margin: 10px 0 5px; color: var(--text-main); }
+.admin-meta p { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; }
+
+/* --- Main Form Card --- */
+.form-container {
+    padding: 35px;
+    border-radius: var(--radius-lg);
+}
+
+.form-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 20px;
+}
+
+.form-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+.form-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+/* --- Form Sections --- */
+.form-section { margin-bottom: 35px; }
+
+.section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* --- Styled Inputs --- */
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+
+.input-group input, 
+.custom-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    transition: 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.input-group input[readonly] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(0,0,0,0.05);
+}
+
+/* --- Validation --- */
+.error-msg {
+    font-size: 0.7rem;
+    color: #f43f5e;
+    margin-top: 4px;
+    display: none;
+}
+
+.input-group input:invalid:not(:placeholder-shown) { border-color: #f43f5e; }
+.input-group input:invalid:not(:placeholder-shown) + .error-msg { display: block; }
+
+/* --- Buttons --- */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-top: 25px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.btn-submit {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 12px 25px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.btn-submit:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+/* --- Mobile Responsive --- */
+@media (max-width: 900px) {
+    .profile-form-container { grid-template-columns: 1fr; }
+    .input-grid { grid-template-columns: 1fr; }
+    .form-footer { flex-direction: column-reverse; }
+    .btn-submit, .btn-cancel { width: 100%; }
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+{% block manageTeachersActive %}{% endblock %}
+{% block manageStudentsActive %}{% endblock %}
+{% block manageClassesActive %}{% endblock %}
+
+<!-- add section title -->
+{% block sectionTitle %}Update Profile{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+ <div class="profile-form-container">
+    <div class="profile-sidebar glass">
+        <div class="avatar-upload">
+            <div class="avatar-preview styled-placeholder" id="avatarContainer">
+                <span class="avatar-text">{{data.fname[0].upper()}} {{data.lname[0].upper()}}</span>
+            </div>
+        </div>
+        <div class="admin-meta">
+            <h3>{{data.fname}} {{data.lname}}</h3>
+            <p>Teaching Staff</p>
+        </div>
+    </div>
+
+    <div class="form-container glass">
+        <div class="form-header">
+            <h3 class="form-title">Update Existing Educator</h3>
+            <p class="form-subtitle">Modify teacher details or update security credentials.</p>
+        </div>
+
+        <form action="{{url_for('teacherViews.updateTeacherProfile')}}" method="POST" class="styled-form" id="teacherForm" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-section">
+                <h4 class="section-label">Personal Information</h4>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="fname">First Name *</label>
+                        <input type="text" id="fname" name="fname" value="{{data.fname}}" required pattern="[A-Za-z\s]{2,}">
+                        <span class="error-msg">Valid first name required</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="lname">Last Name *</label>
+                        <input type="text" id="lname" name="lname" value="{{data.lname}}" required pattern="[A-Za-z\s]{2,}">
+                        <span class="error-msg">Valid last name required</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" value="{{data.email}}" required>
+                        <span class="error-msg">Enter a valid email</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="phone">Phone Number *</label> 
+                        <input type="tel" id="phone" name="phone" value="{{data.phone}}" required pattern="[\+]?[0-9]{10,14}">
+                        <span class="error-msg">Invalid phone format</span>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{{data.id}}">
+            <input type="hidden" name="old_pass" value="{{data.password}}">
+
+            <div class="form-section">
+                <h4 class="section-label">Security & Password</h4>
+                <p class="form-subtitle" style="margin-bottom: 15px;">Leave these blank to keep the current password.</p>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="password">New Password</label>
+                        <input type="password" id="password" name="password" placeholder="Min. 8 characters" minlength="8">
+                        <span class="error-msg">Password must be at least 8 characters</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirm_password">Confirm New Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Repeat new password">
+                        <span class="error-msg" id="match-error">Passwords do not match</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="reset" class="btn-cancel">Discard</button>
+                <button type="submit" class="btn-submit">Update Teacher</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- add custom JS -->
+{% block addJS %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const profileForm = document.getElementById('profileUpdateForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const passError = document.getElementById('passwordError');
+
+    // Function to check if passwords match
+    function validatePassword() {
+        if (password.value !== confirmPassword.value && confirmPassword.value !== "") {
+            confirmPassword.classList.add('mismatch');
+            passError.style.display = 'block';
+            return false;
+        } else {
+            confirmPassword.classList.remove('mismatch');
+            passError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Real-time password matching
+    confirmPassword.addEventListener('input', validatePassword);
+    password.addEventListener('input', validatePassword);
+
+    // Form submission check
+    profileForm.addEventListener('submit', (e) => {
+        const isMatch = validatePassword();
+        const isValid = profileForm.checkValidity();
+
+        if (!isValid || !isMatch) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const submitBtn = profileForm.querySelector('.btn-primary');
+            submitBtn.style.animation = 'shake 0.4s ease';
+            setTimeout(() => { submitBtn.style.animation = 'none'; }, 400);
+
+            // Focus the first error
+            const firstInvalid = profileForm.querySelector(':invalid') || profileForm.querySelector('.mismatch');
+            if (firstInvalid) firstInvalid.focus();
+        }
+    });
+});
+
+
+const password = document.getElementById('password');
+const confirm = document.getElementById('confirm_password');
+const matchError = document.getElementById('match-error');
+
+function checkMatch() {
+    if (confirm.value !== "" && password.value !== confirm.value) {
+        confirm.style.borderColor = "#f43f5e";
+        matchError.style.display = "block";
+    } else {
+        confirm.style.borderColor = "";
+        matchError.style.display = "none";
+    }
+}
+
+password.addEventListener('input', checkMatch);
+confirm.addEventListener('input', checkMatch);
+</script>
+{% endblock %}

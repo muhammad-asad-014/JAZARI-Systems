@@ -1,0 +1,44 @@
+/* Register Fonts for Offline Use */
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter-Medium.ttf') format('truetype');
+    font-weight: 500;
+}
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+
+:root {
+    --font-main: 'Inter', -apple-system, sans-serif;
+    /* Colors - Soft Pastel Palette */
+    --bg-color: #f0f2f5;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --accent-color: #6366f1; /* Indigo */
+    --accent-hover: #4f46e5;
+
+    /* Glassmorphism Specs */
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: rgba(31, 38, 135, 0.07);
+    --blur-strength: 16px;
+
+    /* Spacing & Sizes */
+    --radius-lg: 24px;
+    --radius-md: 12px;
+    --padding-card: 40px;
+    
+    /* Animation Colors (Soft Pastels) */
+    --blob-1: #ffedd5; /* Peach */
+    --blob-2: #dcfce7; /* Mint */
+    --blob-3: #e0e7ff; /* Lavender */
+    --blob-4: #fae8ff; /* Pink */
+}

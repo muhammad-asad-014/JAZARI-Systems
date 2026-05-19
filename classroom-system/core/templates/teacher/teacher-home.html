@@ -1,0 +1,398 @@
+{% extends 'teacher/teacher-base.html' %}
+{% block title %}Home{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+    /* --- Todo Container --- */
+.todo-container {
+    padding: 25px;
+    height: 100%;
+}
+
+.todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.todo-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.btn-add-task {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+/* --- List Items --- */
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(5px);
+}
+
+/* --- Custom Checkbox --- */
+.todo-checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.todo-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border:1px solid rgba(123, 123, 123, 0.2);
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+.todo-checkbox input:checked ~ .checkmark {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.todo-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* --- Content Styling --- */
+.todo-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.todo-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.todo-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* --- "Done" State Styling --- */
+.todo-item.done .todo-title {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+.status-badge.success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.status-badge.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+    .status-badge { display: none; } /* Hide status on mobile to save space */
+}
+
+/* The Background Overlay */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent black */
+    backdrop-filter: blur(5px); /* Blurs the dashboard behind the modal */
+}
+
+/* The Glass Modal Box */
+.modal-content.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    margin: 15% auto; /* Center it vertically/horizontally */
+    /* box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); */
+    color: rgb(0, 0, 0);
+    text-align: center;
+}
+
+/* Form Styling */
+.modal-content h3 {
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    color: rgb(0, 0, 0);
+    outline: none;
+}
+
+.modal-content input::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Button Container */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-save, .btn-cancel {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-save {
+    background: #4e73df; /* Primary Blue */
+    color: rgb(252, 252, 252);
+}
+
+.btn-save:hover {
+    background: #2e59d9;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgb(0, 0, 0);
+    border: 1px solid rgba(0, 0, 0, 0.32);
+}
+
+.btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.todo-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-delete-task {
+    background: none;
+    border: none;
+    color: rgba(255, 0, 0, 0.4);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: 0.3s;
+}
+
+.btn-delete-task:hover {
+    color: #ff4d4d; /* Red on hover */
+    transform: scale(1.2);
+}
+
+</style>
+
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}active{% endblock %}
+{% block manageTeachersActive %}{% endblock %}
+{% block manageStudentsActive %}{% endblock %}
+{% block manageClassesActive %}{% endblock %}
+
+<!-- add section title -->
+{% block sectionTitle %}Welcome Back!{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+            <section class="stats-grid">
+                <div class="stat-card glass">
+                    <h3>Students</h3>
+                    <p class="stat-value">{{data.students}}</p>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Lectures Delivered</h3>
+                    <p class="stat-value">{{data.lectures}}</p>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Quizzes Hosted</h3>
+                    <p class="stat-value">{{data.quizzes}}</p>
+                </div>
+
+                
+            </section>
+<section class="todo-container glass">
+    <div class="todo-header">
+        <h3>To-Do List</h3>
+        <button class="btn-add-task" onclick="openModal()">+</button> 
+    </div>
+    
+    <div class="todo-list">
+        {% for task in tasks %}
+        <div class="todo-item {{ 'done' if task.is_done }}">
+            <label class="todo-checkbox">
+                <input type="checkbox" {{ 'checked' if task.is_done }} 
+                       onclick="updateTask('{{ task.id }}')">
+                <span class="checkmark"></span>
+            </label>
+            <div class="todo-content">
+                <span class="todo-title">{{ task.title }}</span>
+                <span class="todo-date">{{ task.date_created.strftime('%b %d') }}</span>
+            </div>
+            
+            <div class="todo-actions">
+                {% if task.is_done %}
+                    <span class="status-badge success">Done</span>
+                {% else %}
+                    <span class="status-badge warning">Pending</span>
+                {% endif %}
+                
+                <button class="btn-delete-task" onclick="deleteTask('{{ task.id }}')" title="Delete Task">
+                    &times;
+                </button>
+            </div>
+        </div>
+        {% else %}
+            <p style="padding: 20px; text-align: center;">No tasks yet!</p>
+        {% endfor %}
+    </div>
+    
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content glass">
+            <h3>Add New Task</h3>
+            <form action="{{ url_for('teacherViews.add_task') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="text" name="task_title" placeholder="What needs to be done?" required>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Add Task</button>
+                    <button type="button" onclick="closeModal()" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+<!-- add custom JS -->
+{% block addJS %}
+
+<script>
+const update_base_url = "{{ url_for('teacherViews.update_task', task_id='PLACEHOLDER') }}";
+const delete_base_url = "{{ url_for('teacherViews.delete_task', task_id='PLACEHOLDER') }}";
+
+function updateTask(taskId) {
+    const url = update_base_url.replace('PLACEHOLDER', taskId);
+    sendTaskRequest(url);
+}
+
+// DELETE FUNCTION
+function deleteTask(taskId) {
+    if (confirm("Are you sure you want to delete this task?")) {
+        const url = delete_base_url.replace('PLACEHOLDER', taskId);
+        sendTaskRequest(url);
+    }
+}
+
+// Reusable Fetch Function to handle both Update and Delete
+function sendTaskRequest(url) {
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': "{{ csrf_token() }}" // Essential for security
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert("Action failed. Please try again.");
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+const modal = document.getElementById("addTaskModal");
+const btn = document.querySelector(".btn-add-task");
+
+// Open modal when '+' is clicked
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+// Close modal function
+function closeModal() {
+    modal.style.display = "none";
+}
+</script>
+{% endblock %}

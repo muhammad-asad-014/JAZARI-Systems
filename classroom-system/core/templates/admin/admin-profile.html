@@ -1,0 +1,371 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}Update Profile{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+
+    /* --- Profile Update Layout --- */
+.profile-update-wrapper {
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.profile-form-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+/* --- Sidebar / Avatar --- */
+.profile-sidebar {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 4px solid var(--glass-border);
+    background: var(--glass-bg);
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.upload-btn-wrapper input[type=file] {
+    position: absolute;
+    left: 0; top: 0; opacity: 0;
+    cursor: pointer;
+}
+
+.admin-meta h3 { font-size: 1.1rem; margin-top: 15px; letter-spacing: -0.02em; }
+.admin-meta p { color: var(--text-muted); font-size: 0.85rem; }
+
+/* --- Main Form Area --- */
+.profile-main {
+    padding: 40px;
+}
+
+.form-section-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.input-group input {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--glass-border);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    color: var(--text-main);
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* --- Buttons --- */
+.form-actions {
+    margin-top: 40px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding-top: 25px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover { transform: translateY(-2px); background: var(--accent-hover); }
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 12px 30px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+/* --- Sidebar / Avatar Styling --- */
+.profile-sidebar {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--glass-border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+    /* Flexbox to center text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The new colored placeholder style */
+.avatar-preview.styled-placeholder {
+    /* Use a subtle gradient based on theme colors for an elegant look */
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1); /* Adds internal depth */
+}
+
+.avatar-text {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    /* Slight shadow to make text pop off color */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+    .profile-form-container { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .profile-sidebar { padding: 30px; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Validation Feedback --- */
+.error-msg {
+    font-size: 0.7rem;
+    color: #f43f5e;
+    font-weight: 500;
+    margin-top: 4px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Base validation states */
+.input-group input:not(:placeholder-shown):invalid {
+    border-color: rgba(244, 63, 94, 0.5);
+    background: rgba(244, 63, 94, 0.05);
+}
+
+.input-group input:not(:placeholder-shown):invalid + .error-msg {
+    display: block;
+}
+
+/* Special class for password mismatch */
+.input-group input.mismatch {
+    border-color: rgba(244, 63, 94, 0.5) !important;
+    background: rgba(244, 63, 94, 0.05) !important;
+}
+
+.input-group input.mismatch + .error-msg {
+    display: block;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+</style>
+
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+{% block manageTeachersActive %}{% endblock %}
+{% block manageStudentsActive %}{% endblock %}
+{% block manageClassesActive %}{% endblock %}
+
+<!-- add section title -->
+{% block sectionTitle %}Update Profile{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+<div class="profile-update-wrapper">
+    <form action="{{url_for('adminViews.updateAdminProfile')}}" method="POST" enctype="multipart/form-data" class="profile-form-container" id="profileUpdateForm" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="profile-sidebar glass">
+        <div class="avatar-upload">
+            <div class="avatar-preview styled-placeholder" id="avatarContainer">
+                <span class="avatar-text">AD</span>
+            </div>
+        </div>
+        <div class="admin-meta">
+            <h3>{{data.fname}} {{data.lname}}</h3>
+            <p>Administrator</p>
+        </div>
+    </div>
+
+    <div class="profile-main glass">
+        <h3 class="form-section-title">Personal Details</h3>
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="fname">First Name</label>
+                <input type="text" id="fname" name="fname" value="{{data.fname}}" placeholder="Enter First Name" 
+                       required pattern="[A-Za-z\s]{2,}">
+                <span class="error-msg">Valid first name required (letters only)</span>
+            </div>
+            <div class="input-group">
+                <label for="lname">Last Name</label>
+                <input type="text" id="lname" name="lname" value="{{data.lname}}" placeholder="Enter Last Name" 
+                       required pattern="[A-Za-z\s]{2,}">
+                <span class="error-msg">Valid last name required (letters only)</span>
+            </div>
+        </div>
+        <br>
+        <input type="hidden" name="old_uname" value="{{data.username}}"> 
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="uname">Username</label>
+                <input type="text" id="uname" name="uname" value="{{data.username}}" placeholder="Enter Username" 
+                       required pattern="[a-zA-Z0-9._]{3,20}">
+                <span class="error-msg">3-20 characters (letters, numbers, underscores)</span>
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" value="{{data.email}}" placeholder="email@example.com" required>
+                <span class="error-msg">Please enter a valid administrative email</span>
+            </div>
+        </div>
+        <input type="hidden" name="old_pass" value="{{data.password}}">
+        <h3 class="form-section-title" style="margin-top: 30px;">Security</h3>
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="password">New Password</label>
+                <input type="password" id="password" name="password" placeholder="Leave blank to keep current" 
+                       minlength="8">
+                <span class="error-msg">Password must be at least 8 characters</span>
+            </div>
+            <div class="input-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your new password">
+                <span class="error-msg" id="passwordError">Passwords do not match</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="reset" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+    </div>
+</form>
+</div>
+{% endblock %}
+
+<!-- add custom JS -->
+{% block addJS %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const profileForm = document.getElementById('profileUpdateForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const passError = document.getElementById('passwordError');
+
+    // Function to check if passwords match
+    function validatePassword() {
+        if (password.value !== confirmPassword.value && confirmPassword.value !== "") {
+            confirmPassword.classList.add('mismatch');
+            passError.style.display = 'block';
+            return false;
+        } else {
+            confirmPassword.classList.remove('mismatch');
+            passError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Real-time password matching
+    confirmPassword.addEventListener('input', validatePassword);
+    password.addEventListener('input', validatePassword);
+
+    // Form submission check
+    profileForm.addEventListener('submit', (e) => {
+        const isMatch = validatePassword();
+        const isValid = profileForm.checkValidity();
+
+        if (!isValid || !isMatch) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const submitBtn = profileForm.querySelector('.btn-primary');
+            submitBtn.style.animation = 'shake 0.4s ease';
+            setTimeout(() => { submitBtn.style.animation = 'none'; }, 400);
+
+            // Focus the first error
+            const firstInvalid = profileForm.querySelector(':invalid') || profileForm.querySelector('.mismatch');
+            if (firstInvalid) firstInvalid.focus();
+        }
+    });
+});
+</script>
+{% endblock %}

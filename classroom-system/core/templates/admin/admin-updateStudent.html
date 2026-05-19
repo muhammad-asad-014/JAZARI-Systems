@@ -1,0 +1,424 @@
+{% extends 'admin/admin-base.html' %}
+{% block title %}Update Student{% endblock %}
+
+<!-- add custom css -->
+{% block addCSS %}
+<style>
+/* --- Wrapper Animation --- */
+.form-wrapper {
+    animation: slideUpFade 0.5s ease-out;
+    width: 100%;
+    max-width: 900px;
+    /* margin: 0 auto; */
+}
+
+.form-container {
+    padding: var(--padding-card);
+}
+
+.form-header {
+    margin-bottom: 35px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 20px;
+}
+
+.form-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+}
+
+.form-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+}
+
+/* --- Form Layout --- */
+.form-section {
+    margin-bottom: 30px;
+}
+
+.section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-color);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* --- Styled Inputs --- */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.input-group input, 
+.custom-select {
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid var(--glass-border);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-main);
+    color: var(--text-main);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus, 
+.custom-select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.4);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Fix for Date & Select icons */
+.custom-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+/* --- Footer Buttons --- */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 25px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.btn-submit {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    padding: 12px 28px;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* --- Mobile Responsive --- */
+@media (max-width: 768px) {
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-container {
+        padding: 25px;
+    }
+    .form-footer {
+        flex-direction: column-reverse;
+    }
+    .btn-submit, .btn-cancel {
+        width: 100%;
+    }
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+
+.profile-form-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+
+.admin-meta h3 { font-size: 1.1rem; margin-top: 15px; letter-spacing: -0.02em; }
+.admin-meta p { color: var(--text-muted); font-size: 0.85rem; }
+
+
+/* --- Sidebar / Avatar Styling --- */
+.profile-sidebar {
+    padding: 40px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--glass-border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+    /* Flexbox to center text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The new colored placeholder style */
+.avatar-preview.styled-placeholder {
+    /* Use a subtle gradient based on theme colors for an elegant look */
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1); /* Adds internal depth */
+}
+
+.avatar-text {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    /* Slight shadow to make text pop off color */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+    .profile-form-container { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .profile-sidebar { padding: 30px; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Global Validation Styles (Same as Teacher) --- */
+.error-msg {
+    font-size: 0.7rem;
+    color: #f43f5e;
+    font-weight: 500;
+    margin-top: 4px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.input-group input:not(:placeholder-shown):invalid,
+.input-group select:not(:placeholder-shown):invalid {
+    border-color: rgba(244, 63, 94, 0.5);
+    background: rgba(244, 63, 94, 0.05);
+}
+
+.input-group input:not(:placeholder-shown):invalid + .error-msg,
+.input-group select:not(:placeholder-shown):invalid + .error-msg {
+    display: block;
+}
+
+/* --- Student Specific File Input Styling --- */
+.file-input {
+    padding: 8px 12px !important;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Style for when a file is validly selected */
+.input-group input[type="file"]:valid {
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+</style>
+{% endblock %}
+
+<!-- navlinks activation -->
+{% block overviewActive %}{% endblock %}
+{% block manageTeachersActive %}{% endblock %}
+{% block manageStudentsActive %}active{% endblock %}
+{% block manageClassesActive %}{% endblock %}
+
+<!-- add section title -->
+{% block sectionTitle %}Update Student{% endblock %}
+
+<!-- add section code -->
+{% block section %}
+  <div class="profile-form-container">
+    <div class="profile-sidebar glass">
+           <div class="avatar-upload">
+    <div class="avatar-preview {% if not data.photo %}styled-placeholder{% endif %}" id="avatarContainer">
+        
+        {% if data.photo %}
+            <img src="{{ url_for('adminViews.serve_photo', filename=data.photo.split('/') | last) }}" alt="Student Photo">        {% else %}
+            <!-- Shows first letter of first and last name as fallback (e.g., SA) -->
+            <span class="avatar-text">{{ data.fname[:1] }}{{ data.lname[:1] }}</span>
+        {% endif %}
+        
+    </div>
+</div>
+            <div class="admin-meta">
+                <h3>{{data.fname}} {{data.lname}} </h3>
+                <p>Student</p>
+            </div>
+        </div>
+    <div class="form-container glass">
+        <div class="form-header">
+            <h3 class="form-title">Update Existing Student</h3>
+            <p class="form-subtitle">Fill in the details to update an existing student account.</p>
+        </div>
+<form action="{{url_for('adminViews.updateStudent', student_id = data.id)}}" method="POST" class="styled-form" id="studentForm" enctype="multipart/form-data" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-section">
+        <h4 class="section-label">Personal Information</h4>
+        <div class="input-grid">
+            <div class="input-group">
+                <label for="fname">First Name *</label>
+                <input type="text" id="fname" name="fname" placeholder="e.g. Sarah" value="{{data.fname}}"
+                       required pattern="[A-Za-z\s]{2,}" title="Minimum 2 letters">
+                <span class="error-msg">Please enter a valid first name</span>
+            </div>
+            <div class="input-group">
+                <label for="lname">Last Name *</label>
+                <input type="text" id="lname" name="lname" placeholder="e.g. Amjad" value="{{data.lname}}"
+                       required pattern="[A-Za-z\s]{2,}" title="Minimum 2 letters">
+                <span class="error-msg">Please enter a valid last name</span>
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" placeholder="sarah.a@jazari.com" value="{{data.email}}" required>
+                <span class="error-msg">A valid email is required</span>
+            </div>
+            <div class="input-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="phone" placeholder="+92 300 1234567" value="{{data.phone}}"
+                       required pattern="[\+]?[0-9]{10,14}">
+                <span class="error-msg">Format: +923001234567</span>
+            </div>
+            <input type="text" name="photo_path" value="{{data.photo}}" hidden id="">
+            <input type="text" name="embedding" value="{{data.embedding}}" hidden id="">
+            <div class="input-group">
+                <label for="photo">Personal Picture *</label>
+                <input type="file" id="photo" name="photo" accept="image/*"  class="file-input" >
+                <span class="error-msg">A profile picture is required</span>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h4 class="section-label">Institutional Details</h4>
+        <div class="input-grid">
+            <div class="input-group">
+                <label for="department">Class *</label>
+                <select id="department" name="class" class="custom-select" required>
+                    {% for class in classes%}
+                    {% if class==data.classID %}
+                        <option value="{{class}}" selected>{{class}}</option>
+                    {% else %}
+                        <option value="{{class}}">{{class}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <span class="error-msg">Please select a class</span>
+            </div>
+            <div class="input-group">
+                <label for="student_id">Student ID *</label>
+                <input type="text" id="student_id" name="student_id" placeholder="STR2026001" 
+                       required pattern="[A-Z0-9]{5,15}" readonly value="{{data.id.upper()}}">
+                <span class="error-msg">ID must be 5-15 Alphanumeric characters</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-footer">
+        <button type="reset" class="btn-cancel">Discard</button>
+        <button type="submit" class="btn-submit">Update Student</button>
+    </div>
+</form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- add custom JS -->
+{% block addJS %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const studentForm = document.getElementById('studentForm');
+    const photoInput = document.getElementById('photo');
+
+    // 1. File Size Validation (Max 2MB)
+    photoInput.addEventListener('change', function() {
+        if (this.files[0].size > 2 * 1024 * 1024) {
+            alert("Image is too large! Please choose a file under 2MB.");
+            this.value = ""; // Reset the input
+        }
+    });
+
+    // 2. Form Submission Guard
+    studentForm.addEventListener('submit', (e) => {
+        const submitBtn = studentForm.querySelector('.btn-submit');
+
+        if (!studentForm.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Visual feedback
+            submitBtn.style.animation = 'shake 0.4s ease';
+            setTimeout(() => { submitBtn.style.animation = 'none'; }, 400);
+
+            // Focus first error
+            const firstInvalid = studentForm.querySelector(':invalid');
+            if (firstInvalid) firstInvalid.focus();
+        }
+    });
+});
+</script>
+
+{% endblock %}

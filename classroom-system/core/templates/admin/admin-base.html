@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{% endblock %} - JAZARI</title>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='../../static/css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../../static/css/admin-base.css') }}">
+    {% block addCSS %}{% endblock %}
+
+</head>
+
+<body>
+
+    <div class="notification-container" id="notification-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="toast glass {{ category }}">
+                        <div class="toast-icon">
+                            {% if category == 'success' %}✓{% else %}✕{% endif %}
+                        </div>
+                        <div class="toast-content">{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="blob-container" id="blob-container"></div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar glass">
+            <div class="sidebar-header">
+                <div class="brand">
+                <a href="{{url_for('adminViews.home')}}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="JAZARI Logo" class="brand-logo">
+                </a>
+            </div>
+
+                <input type="checkbox" id="menu-toggle" hidden>
+
+                <label for="menu-toggle" class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </label>
+
+                <div class="nav-container">
+                    <div class="nav-content">
+                        <ul class="nav-links">
+                            <li class="{% block overviewActive %}{% endblock %}"><a href="{{url_for('adminViews.home')}}">Overview</a></li>
+                            <li class="{% block manageTeachersActive %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.manageTeachers')}}">Manage Teaching Staff</a></li>
+                            <li class="{% block manageStudentsActive %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.manageStudents')}}">Manage Students</a></li>
+                            <li class="{% block manageClassesActive %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.manageClasses')}}">Manage Classes</a></li>
+                            <li class="{% block PluginStore %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.plugin_store')}}">Plugin Store</a></li>
+                                    <li class="{% block managePluginsActive %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.plugins')}}">Manage Plugins</a></li>
+                                    <li class="{% block manageSettingsActive %}{% endblock %}"><a
+                                    href="{{url_for('adminViews.settings')}}">System Settings</a></li>
+                        </ul>
+
+                        <div class="user-profile-container">
+                            <button class="user-profile-trigger" id="profileTrigger" aria-haspopup="true">
+                                <div class="avatar">AD</div>
+                                <span class="user-name">{{session['fullname']}}</span>
+                                <span class="chevron"></span>
+                            </button>
+
+                            <div class="profile-dropdown glass" id="profileDropdown">
+                                <a href="{{url_for('adminViews.updateAdminProfile')}}" class="dropdown-item">
+                                    <span class="icon">⏣</span> Update Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{{url_for('auth.logout')}}" class="dropdown-item logout">
+                                    <span class="icon">⏻</span> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+
+        <main class="main-content">
+            <header class="top-bar glass">
+                <h1 style="font-weight: 300;">{% block sectionTitle %}{% endblock %}</h1>
+                <div class="date-picker"></div>
+            </header>
+            <!-- sections start here -->
+            <!-- <section class="stats-grid">
+                <div class="stat-card glass">
+                    <h3>Users</h3>
+                    <p class="stat-value">1,284</p>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Revenue</h3>
+                    <p class="stat-value">$14,200</p>
+                </div>
+                <div class="stat-card glass">
+                    <h3>Tasks</h3>
+                    <p class="stat-value">24</p>
+                </div>
+            </section>
+
+            <section class="data-table-container glass">
+                <h3>Activity</h3>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody>
+                            <tr><td>System Update</td><td>Done</td><td>Dec 18</td></tr>
+                            <tr><td>Server Backup</td><td>Pending</td><td>Dec 19</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section> -->
+            <!-- sections end here -->
+            {% block section %}{% endblock %}
+
+        </main>
+    </div>
+
+    <footer class="copyright">© 2026 JAZARI. ALL RIGHTS RESERVED.</footer>
+
+    <script src="{{ url_for('static', filename='../../static/js/login.js') }}"></script>
+    {% block addJS %}{% endblock %}
+
+    <script>
+        const dateString = new Date().toDateString();
+        document.getElementsByClassName("date-picker")[0].innerHTML = dateString;
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('profileTrigger');
+    const dropdown = document.getElementById('profileDropdown');
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+        trigger.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+            trigger.classList.remove('active');
+        }
+    });
+
+    // Handle Date
+    const dateString = new Date().toDateString();
+    const datePicker = document.querySelector(".date-picker");
+    if(datePicker) datePicker.innerHTML = dateString;
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Existing profile/date logic...
+
+    // Auto-disappearing notifications
+    const toasts = document.querySelectorAll('.toast');
+    
+    toasts.forEach(toast => {
+        // 1. Wait 5 seconds
+        setTimeout(() => {
+            // 2. Add the fade-out class
+            toast.classList.add('fade-out');
+            
+            // 3. Physically remove it from the DOM after the animation finishes
+            setTimeout(() => {
+                toast.remove();
+            }, 400); // matches the 0.4s transition in CSS
+        }, 3000); 
+    });
+});
+    </script>
+</body>
+
+</html>
